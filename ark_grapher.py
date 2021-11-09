@@ -103,10 +103,11 @@ def get_sellside_pt(tickers):
     plotdata = pd.DataFrame({"Ratings": ratings}, index=companies)
     plotdata = plotdata.sort_values("Ratings")
     plotdata.plot(kind="bar", title = titl, color = ["#8264ff"])
-    fig = plt.xticks(rotation=90, horizontalalignment="center")
-    fig = plt.ylabel("Mean Sellside Analyst PT %Change from Current Price")
-    fig = plt.xlabel("Companies")
-    st.pyplot(fig)
+    plt.xticks(rotation=90, horizontalalignment="center")
+    plt.ylabel("Mean Sellside Analyst PT %Change from Current Price")
+    plt.xlabel("Companies")
+    st.pyplot()
+    st.write("Plotted sellside analyst PT percent difference from current price")
 
 def get_sellside_ratings(tickers):
     recommendations = []
