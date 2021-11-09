@@ -4,5 +4,5 @@ pandas
 yahoo_fin
 pandas_datareader
 numpy
-matplotlib.pyplot
+matplotlib
 streamlit
