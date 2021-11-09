@@ -1,4 +1,5 @@
 
+from PIL.Image import ROTATE_90
 import requests
 import pandas as pd
 from yahoo_fin import stock_info as si 
@@ -32,7 +33,7 @@ def list_tickers(ticks):
 def get_sellside_pt(tickers):
     recommendations = []
     ticker_recs = [["TICKER","RATING","NUMBER OF ANALYSTS","CURRENT PRICE", "MEAN ANALYST PT", "ANALYST PT RANGE", "DIFFERENCE TO ANALYST PT MEAN","PERCENT DIF. TO ANALYST PT MEAN"]]
-    print("accessing analyst ratings...")
+    print("accessing analyst PT change percentage (this can take several seconds)...")
     for ticker in tickers:
         lhs_url = 'https://query2.finance.yahoo.com/v10/finance/quoteSummary/'
         rhs_url = '?formatted=true&crumb=swg7qs5y9UP&lang=en-US&region=US&' \
@@ -103,10 +104,19 @@ def get_sellside_pt(tickers):
     plotdata = pd.DataFrame({"Ratings": ratings}, index=companies)
     plotdata = plotdata.sort_values("Ratings")
     plotdata.plot(kind="bar", title = titl, color = ["#8264ff"])
-    plt.xticks(rotation=90, horizontalalignment="center")
-    plt.ylabel("Mean Sellside Analyst PT %Change from Current Price")
-    plt.xlabel("Companies")
-    st.pyplot()
+    fig, ax = plt.subplots()
+    rects1 = ax.bar(ratings)
+    fig.bar(companies, ratings, color='#8264ff')
+    ax.set_xticks(companies, rotate=90)
+    ax.set_xlabel("Companies")
+    ax.set_ylabel("Mean Sellside Analyst PT %Change from Current Price")
+    ax.bar_label(rects1)
+    fig.tight_layout()
+    
+    # plt.xticks(rotation=90, horizontalalignment="center")
+    # plt.ylabel("Mean Sellside Analyst PT %Change from Current Price")
+    # plt.xlabel("Companies")
+    st.pyplot(fig)
     st.write("Plotted sellside analyst PT percent difference from current price")
 
 def get_sellside_ratings(tickers):
