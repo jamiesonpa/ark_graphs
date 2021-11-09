@@ -103,10 +103,10 @@ def get_sellside_pt(tickers):
     plotdata = pd.DataFrame({"Ratings": ratings}, index=companies)
     plotdata = plotdata.sort_values("Ratings")
     plotdata.plot(kind="bar", title = titl, color = ["#8264ff"])
-    plt.xticks(rotation=90, horizontalalignment="center")
-    plt.ylabel("Mean Sellside Analyst PT %Change from Current Price")
-    plt.xlabel("Companies")
-    plt.show()
+    fig = plt.xticks(rotation=90, horizontalalignment="center")
+    fig = plt.ylabel("Mean Sellside Analyst PT %Change from Current Price")
+    fig = plt.xlabel("Companies")
+    st.pyplot(fig)
 
 def get_sellside_ratings(tickers):
     recommendations = []
@@ -420,8 +420,9 @@ opexrev = st.sidebar.checkbox(label="Opex/Revenue")
 simons = st.sidebar.checkbox(label="1y Growth Rate of (R&D/Revenue)")
 
 analyze = st.sidebar.button("ANALYZYE")
-st.write("Getting ARKG tickers...")
+st.write("Preparing Tool...")
 tickers = get_arkg_tickers()
+st.write("Ready...")
 if analyze:
 
     if tickerlist:
