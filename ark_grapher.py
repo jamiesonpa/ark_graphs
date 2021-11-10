@@ -23,7 +23,7 @@ def get_institutional_holders(ticks):
         soup = BeautifulSoup(req.content, "html.parser")
         table_of_interest = []
         for table in soup.find_all("table"):
-            st.write(str(table.get("class")))
+            st.write(str(table.html))
 
 def get_arkg_tickers():
     #this is the link that downloads the csv of the current ARKG holdings
