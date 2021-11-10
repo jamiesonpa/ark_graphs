@@ -20,7 +20,7 @@ def get_institutional_holders(ticks):
     
     for link in links:
         req = requests.get(link)
-        target = str(req.content).split('data-reactid="30">')[1].split("</td>")
+        target = str(req.content).split('data-reactid="30">')[1].split("</td>")[0]
         st.write(str(target))
 
 def get_arkg_tickers():
