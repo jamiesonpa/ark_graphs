@@ -24,7 +24,7 @@ def get_institutional_holders(ticks):
         table_of_interest = []
         for table in soup.find_all("table", attrs={"class":"W(100%) M(0) BdB Bdc($seperatorColor)"}):
             table_of_interest.append(table)
-        st.write(table)
+        st.write(str(table_of_interest))
 
 def get_arkg_tickers():
     #this is the link that downloads the csv of the current ARKG holdings
