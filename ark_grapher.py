@@ -20,8 +20,11 @@ def get_institutional_holders(ticks):
     
     for link in links:
         req = requests.get(link)
-        target = str(req.content).split('data-reactid="30">')[1].split("</td>")[0]
-        st.write(str(target))
+        try:
+            target = str(req.content).split('data-reactid="30">')[1].split("</td>")[0]
+            st.write(str(target))
+        except:
+            pass    
 
 def get_arkg_tickers():
     #this is the link that downloads the csv of the current ARKG holdings
