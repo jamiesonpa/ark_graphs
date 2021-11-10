@@ -7,8 +7,25 @@ from pandas_datareader import DataReader
 import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
+import bs4
+from bs4 import BeautifulSoup
 
+def get_institutional_holders(ticks):
 
+    base_link = "https://finance.yahoo.com/quote/"
+    links = []
+    for tick in ticks:
+        link = base_link + tick + "/holders/"
+        links.append(link)
+    
+    for link in links:
+        req = requests.get(link)
+        soup = BeautifulSoup(link.content, "html.parser")
+        table_of_interest = []
+        for table in soup.find_all("table", attrs={"class":"W(100%) M(0) BdB Bdc($seperatorColor)"}):
+            table_of_interest.append(table)
+        st.write(table)
+        
 def get_arkg_tickers():
     #this is the link that downloads the csv of the current ARKG holdings
     hdr = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -429,6 +446,7 @@ rdrevmultiple = st.sidebar.checkbox(label="R&D/Revenue Multiple")
 grossmargins = st.sidebar.checkbox(label="Gross Margins")
 opexrev = st.sidebar.checkbox(label="Opex/Revenue")
 simons = st.sidebar.checkbox(label="1y Growth Rate of (R&D/Revenue)")
+inst = st.sidebar.checkbox(label="Proportion of Shares held by institutions")
 
 analyze = st.sidebar.button("ANALYZYE")
 st.write("Preparing Tool...")
@@ -462,3 +480,7 @@ if analyze:
     if simons:
         st.write("Getting (R&D/Revenue) Growthrate...")
         get_simons_multiple(tickers)
+    
+    if inst:
+        st.write("Getting share held by institutions...")
+        get_institutional_holders(tickers)
