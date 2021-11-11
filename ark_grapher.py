@@ -10,21 +10,33 @@ import matplotlib.pyplot as plt
 
 
 def get_institutional_holders(ticks):
-    finaldata = {}
+    institutional_holders = {}
+    institutional_shares = {}
+    insider_shares = {}
     for tick in ticks:
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
         print("accessing income statement for " + tick)
         holders = si.get_holders(tick,headers=headers)
         data={}
         num_institutions = (holders["Major Holders"].iloc[3][0])
-        institutional_shares = (holders["Major Holders"].iloc[1][0])
-        insider_shares = (holders["Major Holders"].iloc[0][0])
-        data["InstitutionNumber"] = num_institutions
-        data["InstitutionShares"] = institutional_shares
-        data["InsiderShares"] = insider_shares
-        finaldata[tick] = data
-        
-    print(str(finaldata))
+        instshares = (holders["Major Holders"].iloc[1][0])
+        insishares = (holders["Major Holders"].iloc[0][0])
+        institutional_holders[tick] = num_institutions
+        institutional_shares[tick] = instshares
+        insider_shares[tick] = insishares
+
+
+    st.write("Number of institutions holding by stock")
+    df = pd.DataFrame.from_dict(num_institutions, orient='index')
+    st.bar_chart(df)
+
+    st.write("% Of Shares held by Institutions by stock")
+    df = pd.DataFrame.from_dict(instshares, orient='index')
+    st.bar_chart(df)
+
+    st.write("% Of Shares held by Insiders by stock")
+    df = pd.DataFrame.from_dict(insishares, orient='index')
+    st.bar_chart(df)
 
 def get_arkg_tickers():
     #this is the link that downloads the csv of the current ARKG holdings
@@ -118,7 +130,6 @@ def get_sellside_pt(tickers):
     companies = list(data.keys())
     ratings = list(data.values())
     df = pd.DataFrame.from_dict(data, orient='index')
-    st.write(str(df))
     st.bar_chart(df)
     st.write("Plotted sellside analyst PT percent difference from current price")
 
