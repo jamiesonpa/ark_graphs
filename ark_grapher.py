@@ -30,13 +30,13 @@ def get_institutional_holders(ticks):
     df1 = pd.DataFrame(list(institutional_holders.values()),index=institutional_holders.keys())
     st.bar_chart(df1)
 
-    # st.write("% Of Shares held by Institutions by stock")
-    # df2 = pd.DataFrame(institutional_shares.columns, index=institutional_shares.keys())
-    # st.bar_chart(df2)
+    st.write("% Of Shares held by Institutions by stock")
+    df2 = pd.DataFrame(list(institutional_shares.values()),index=institutional_shares.keys())
+    st.bar_chart(df2)
 
-    # st.write("% Of Shares held by Insiders by stock")
-    # df3 = pd.DataFrame(insider_shares, index=insider_shares.keys())
-    # st.bar_chart(df3)
+    st.write("% Of Shares held by Insiders by stock")
+    df3 = pd.DataFrame(list(insider_shares.values()),index=insider_shares.keys())
+    st.bar_chart(df3)
 
 def get_arkg_tickers():
     #this is the link that downloads the csv of the current ARKG holdings
