@@ -27,15 +27,15 @@ def get_institutional_holders(ticks):
 
 
     st.write("Number of institutions holding by stock")
-    df1 = pd.DataFrame.from_dict(institutional_holders)
+    df1 = pd.DataFrame.from_dict(institutional_holders, orient="columns")
     st.bar_chart(df1)
 
     st.write("% Of Shares held by Institutions by stock")
-    df2 = pd.DataFrame.from_dict(institutional_shares)
+    df2 = pd.DataFrame.from_dict(institutional_shares, orient="columns")
     st.bar_chart(df2)
 
     st.write("% Of Shares held by Insiders by stock")
-    df3 = pd.DataFrame.from_dict(insider_shares)
+    df3 = pd.DataFrame.from_dict(insider_shares, orient="columns")
     st.bar_chart(df3)
 
 def get_arkg_tickers():
