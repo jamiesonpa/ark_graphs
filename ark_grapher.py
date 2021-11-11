@@ -7,8 +7,6 @@ from pandas_datareader import DataReader
 import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
-import bs4
-from bs4 import BeautifulSoup
 
 def get_institutional_holders(ticks):
     finaldata = {}
