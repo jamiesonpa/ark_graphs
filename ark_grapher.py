@@ -21,9 +21,9 @@ def get_institutional_holders(ticks):
         num_institutions = (holders["Major Holders"].iloc[3][0])
         instshares = (holders["Major Holders"].iloc[1][0])
         insishares = (holders["Major Holders"].iloc[0][0])
-        institutional_holders[tick] = num_institutions
-        institutional_shares[tick] = instshares
-        insider_shares[tick] = insishares
+        institutional_holders[tick] = float(num_institutions.replace('%',""))
+        institutional_shares[tick] = float(instshares.replace('%',""))
+        insider_shares[tick] = float(insishares.replace('%',""))
 
 
     st.write("Number of institutions holding by stock")
