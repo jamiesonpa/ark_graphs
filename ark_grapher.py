@@ -8,6 +8,7 @@ import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
 
+
 def get_institutional_holders(ticks):
     finaldata = {}
     for tick in ticks:
@@ -117,6 +118,7 @@ def get_sellside_pt(tickers):
     companies = list(data.keys())
     ratings = list(data.values())
     df = pd.DataFrame(data)
+    st.write(df)
     st.bar_chart(df)
     st.write("Plotted sellside analyst PT percent difference from current price")
 
