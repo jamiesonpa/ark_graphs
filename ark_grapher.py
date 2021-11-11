@@ -16,14 +16,17 @@ def get_institutional_holders(ticks):
     for tick in ticks:
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
         print("accessing income statement for " + tick)
-        holders = si.get_holders(tick,headers=headers)
-        data={}
-        num_institutions = (holders["Major Holders"].iloc[3][0])
-        instshares = (holders["Major Holders"].iloc[1][0])
-        insishares = (holders["Major Holders"].iloc[0][0])
-        institutional_holders[tick] = float(num_institutions.replace('%',""))
-        institutional_shares[tick] = float(instshares.replace('%',""))
-        insider_shares[tick] = float(insishares.replace('%',""))
+        try:
+            holders = si.get_holders(tick,headers=headers)
+            data={}
+            num_institutions = (holders["Major Holders"].iloc[3][0])
+            instshares = (holders["Major Holders"].iloc[1][0])
+            insishares = (holders["Major Holders"].iloc[0][0])
+            institutional_holders[tick] = float(num_institutions.replace('%',""))
+            institutional_shares[tick] = float(instshares.replace('%',""))
+            insider_shares[tick] = float(insishares.replace('%',""))
+        except:
+            pass
 
 
     st.write("Number of institutions holding by stock")
