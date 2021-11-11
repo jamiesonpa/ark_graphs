@@ -118,7 +118,7 @@ def get_sellside_pt(tickers):
     companies = list(data.keys())
     ratings = list(data.values())
     df = pd.DataFrame(data)
-    st.write(df)
+    st.write(str(df))
     st.bar_chart(df)
     st.write("Plotted sellside analyst PT percent difference from current price")
 
