@@ -27,16 +27,16 @@ def get_institutional_holders(ticks):
 
 
     st.write("Number of institutions holding by stock")
-    df = pd.DataFrame.from_dict(num_institutions, orient='index')
-    st.bar_chart(df)
+    df1 = pd.DataFrame.from_dict(institutional_holders, orient='index')
+    st.bar_chart(df1)
 
     st.write("% Of Shares held by Institutions by stock")
-    df = pd.DataFrame.from_dict(instshares, orient='index')
-    st.bar_chart(df)
+    df2 = pd.DataFrame.from_dict(institutional_shares, orient='index')
+    st.bar_chart(df2)
 
     st.write("% Of Shares held by Insiders by stock")
-    df = pd.DataFrame.from_dict(insishares, orient='index')
-    st.bar_chart(df)
+    df3 = pd.DataFrame.from_dict(insider_shares, orient='index')
+    st.bar_chart(df3)
 
 def get_arkg_tickers():
     #this is the link that downloads the csv of the current ARKG holdings
@@ -446,7 +446,7 @@ rdrevmultiple = st.sidebar.checkbox(label="R&D/Revenue Multiple")
 grossmargins = st.sidebar.checkbox(label="Gross Margins")
 opexrev = st.sidebar.checkbox(label="Opex/Revenue")
 simons = st.sidebar.checkbox(label="1y Growth Rate of (R&D/Revenue)")
-inst = st.sidebar.checkbox(label="Proportion of Shares held by institutions")
+inst = st.sidebar.checkbox(label="Institutional Holder Info")
 
 analyze = st.sidebar.button("ANALYZYE")
 st.write("Preparing Tool...")
