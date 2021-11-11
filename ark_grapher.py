@@ -437,7 +437,7 @@ def get_simons_multiple(ticks):
             
 
 ticks = get_arkg_tickers()
-get_institutional_holders(ticks[0:10])
+# get_institutional_holders(ticks[0:10])
 
 st.title("ARKG Analytics Tool")
 
