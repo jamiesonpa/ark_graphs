@@ -7,6 +7,7 @@ from pandas_datareader import DataReader
 import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 def get_institutional_holders(ticks):
     finaldata = {}
@@ -116,23 +117,8 @@ def get_sellside_pt(tickers):
                         data[ticker] = float(item[7].replace("%",""))
     companies = list(data.keys())
     ratings = list(data.values())
-    titl = "ARKG Mean Sellside Analyst PT %Change from Current Price"
-    plotdata = pd.DataFrame({"Ratings": ratings}, index=companies)
-    plotdata = plotdata.sort_values("Ratings")
-    plotdata.plot(kind="bar", title = titl, color = ["#8264ff"])
-    fig, ax = plt.subplots()
-    rects1 = ax.bar(ratings)
-    fig.bar(companies, ratings, color='#8264ff')
-    ax.set_xticks(companies, rotate=90)
-    ax.set_xlabel("Companies")
-    ax.set_ylabel("Mean Sellside Analyst PT %Change from Current Price")
-    ax.bar_label(rects1)
-    fig.tight_layout()
-    
-    # plt.xticks(rotation=90, horizontalalignment="center")
-    # plt.ylabel("Mean Sellside Analyst PT %Change from Current Price")
-    # plt.xlabel("Companies")
-    st.pyplot(fig)
+    df = pd.DataFrame(data)
+    st.bar_chart(df)
     st.write("Plotted sellside analyst PT percent difference from current price")
 
 def get_sellside_ratings(tickers):
