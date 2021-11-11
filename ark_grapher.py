@@ -454,7 +454,8 @@ inst = st.sidebar.checkbox(label="Institutional Holder Info")
 analyze = st.sidebar.button("ANALYZYE")
 st.write("Preparing Tool...")
 tickers = get_arkg_tickers()
-tickers = tickers[0:20].append("WVE")
+tickers = tickers[0:20]
+tickers.append("WVE")
 st.write("Ready...")
 if analyze:
 
