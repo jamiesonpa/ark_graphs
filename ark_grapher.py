@@ -11,20 +11,21 @@ import bs4
 from bs4 import BeautifulSoup
 
 def get_institutional_holders(ticks):
-
-    base_link = "https://finance.yahoo.com/quote/"
-    links = []
+    finaldata = {}
     for tick in ticks:
-        link = base_link + tick + "/holders/"
-        links.append(link)
-    
-    for link in links:
-        req = requests.get(link)
-        try:
-            target = str(req.content).split('data-reactid="30">')[1].split("</td>")[0]
-            st.write(str(target))
-        except:
-            pass    
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+        print("accessing income statement for " + tick)
+        holders = si.get_holders(tick,headers=headers)
+        data={}
+        num_institutions = (holders["Major Holders"].iloc[3][0])
+        institutional_shares = (holders["Major Holders"].iloc[1][0])
+        insider_shares = (holders["Major Holders"].iloc[0][0])
+        data["InstitutionNumber"] = num_institutions
+        data["InstitutionShares"] = institutional_shares
+        data["InsiderShares"] = insider_shares
+        finaldata[tick] = data
+        
+    print(str(finaldata))
 
 def get_arkg_tickers():
     #this is the link that downloads the csv of the current ARKG holdings
@@ -436,6 +437,9 @@ def get_simons_multiple(ticks):
     plt.xlabel("Companies")
     plt.show()
             
+
+ticks = get_arkg_tickers()
+get_institutional_holders(ticks[0:10])
 
 st.title("ARKG Analytics Tool")
 
