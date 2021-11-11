@@ -453,6 +453,7 @@ inst = st.sidebar.checkbox(label="Proportion of Shares held by institutions")
 analyze = st.sidebar.button("ANALYZYE")
 st.write("Preparing Tool...")
 tickers = get_arkg_tickers()
+tickers = tickers[0:5]
 st.write("Ready...")
 if analyze:
 
