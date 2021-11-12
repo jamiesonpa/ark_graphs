@@ -619,11 +619,13 @@ if analyze:
     if beta:
         st.write("Getting beta for ARKG tickers...")
         short_floats = get_finviz_data(tickers, "Beta")
-        sfkeys = []
-        sfvals = []
+        betakeys = []
+        betavals = []
         for item in short_floats:
-            if item[1] != "-":
-                sfkeys.append(item[0])
-                sfvals.append(float(item[1]))
-        df1 = pd.DataFrame(sfvals,index=sfkeys)
+            try:
+                betakeys.append(item[0])
+                betavals.append(float(item[1]))
+            except:
+                pass
+        df1 = pd.DataFrame(betavals,index=betakeys)
         st.bar_chart(df1)
