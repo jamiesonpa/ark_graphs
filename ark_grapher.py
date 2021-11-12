@@ -563,8 +563,9 @@ inst = st.sidebar.checkbox(label="Institutional Holder Info")
 news = st.sidebar.checkbox(label="ARKG News")
 analyze = st.sidebar.button("ANALYZYE")
 st.write("Preparing Tool...")
-tickers = get_arkg_tickers()
 st.write("Ready...")
+
+
 if analyze:
     if tickerlist:
         st.write("ARKG Tickers...")
@@ -599,5 +600,5 @@ if analyze:
     
     if news:
         st.write("Getting news for all tickers in ARKG...")
-        get_institutional_holders(tickers)
+        get_news_data(tickers)
     
