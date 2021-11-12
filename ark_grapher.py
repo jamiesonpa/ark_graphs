@@ -7,7 +7,7 @@ from pandas_datareader import DataReader
 import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
-import bs4 as BeautifulSoup
+from bs4 import BeautifulSoup
 
 def get_institutional_holders2(ticks):
     quandl.ApiConfig.api_key = 'FDbdXFJJ3bzri6Qizxy7'
