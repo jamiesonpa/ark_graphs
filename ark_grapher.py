@@ -624,8 +624,9 @@ if analyze:
         unfound = []
         for item in short_floats:
             try:
+                flitem = float(item[1])
                 betakeys.append(item[0])
-                betavals.append(float(item[1]))
+                betavals.append(flitem)
             except:
                 unfound.append(item[0])
              
