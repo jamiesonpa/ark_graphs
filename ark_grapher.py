@@ -621,11 +621,14 @@ if analyze:
         short_floats = get_finviz_data(tickers, "Beta")
         betakeys = []
         betavals = []
+        unfound = []
         for item in short_floats:
             try:
                 betakeys.append(item[0])
                 betavals.append(float(item[1]))
             except:
-                pass
+                unfound.append(item[0])
+             
         df1 = pd.DataFrame(betavals,index=betakeys)
         st.bar_chart(df1)
+        st.write("Couldn't find values for " + str(unfound))
