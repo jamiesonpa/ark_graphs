@@ -566,7 +566,7 @@ analyze = st.sidebar.button("ANALYZYE")
 st.write("Preparing Tool...")
 st.write("Ready...")
 
-tickers = tickers[0:1]
+
 if analyze:
     if tickerlist:
         st.write("ARKG Tickers...")
