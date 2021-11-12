@@ -15,7 +15,7 @@ def get_institutional_holders2(ticks):
     # for tick in ticks:
     #     quandl.get(tick)
 
-def get_finviz_data(tickers):
+def get_finviz_data(tickers, param):
     base_link = "https://finviz.com/quote.ashx?t="
     links = []
     for ticker in tickers:
@@ -56,8 +56,8 @@ def get_finviz_data(tickers):
                             data[names[-1]] = cell.text
                     counter +=1
         ticker = link.split("=")[1]
-        return_vals.append((ticker,data))
-    
+        return_vals.append((ticker,data[param]))
+        print(ticker + ": " + data[param])
     return return_vals
 
 def get_news_data(tickers):
@@ -561,11 +561,12 @@ opexrev = st.sidebar.checkbox(label="Opex/Revenue")
 simons = st.sidebar.checkbox(label="1y Growth Rate of (R&D/Revenue)")
 inst = st.sidebar.checkbox(label="Institutional Holder Info")
 news = st.sidebar.checkbox(label="ARKG News")
+shortfloat = st.sidebar.checkbox(label="Short Float")
 analyze = st.sidebar.button("ANALYZYE")
 st.write("Preparing Tool...")
 st.write("Ready...")
 
-
+tickers = tickers[0:1]
 if analyze:
     if tickerlist:
         st.write("ARKG Tickers...")
@@ -602,3 +603,14 @@ if analyze:
         st.write("Getting news for all tickers in ARKG...")
         get_news_data(tickers)
     
+    if shortfloat:
+        st.write("Getting short float for ARKG tickers...")
+        short_floats = get_finviz_data(tickers, "Short Float")
+        sfkeys = []
+        sfvals = []
+        for item in short_floats:
+            if item[1] != "-":
+                sfkeys.append(item[0])
+                sfvals.append(float((str(item[1]).replace("%",""))))
+        df1 = pd.DataFrame(sfvals,index=sfkeys)
+        st.bar_chart(df1)
