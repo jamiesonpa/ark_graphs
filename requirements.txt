@@ -4,6 +4,5 @@ yahoo_fin
 pandas_datareader
 numpy
 matplotlib
-streamlit
 bs4
-BeautifulSoup
+streamlit
