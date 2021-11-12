@@ -562,6 +562,7 @@ simons = st.sidebar.checkbox(label="1y Growth Rate of (R&D/Revenue)")
 inst = st.sidebar.checkbox(label="Institutional Holder Info")
 news = st.sidebar.checkbox(label="ARKG News")
 shortfloat = st.sidebar.checkbox(label="Short Float")
+beta = st.sidebar.checkbox(label="Beta")
 analyze = st.sidebar.button("ANALYZYE")
 st.write("Preparing Tool...")
 st.write("Ready...")
@@ -604,7 +605,7 @@ if analyze:
         get_news_data(tickers)
     
     if shortfloat:
-        st.write("Getting short float for ARKG tickers...")
+        st.write("Getting short float % for ARKG tickers...")
         short_floats = get_finviz_data(tickers, "Short Float")
         sfkeys = []
         sfvals = []
@@ -612,5 +613,17 @@ if analyze:
             if item[1] != "-":
                 sfkeys.append(item[0])
                 sfvals.append(float((str(item[1]).replace("%",""))))
+        df1 = pd.DataFrame(sfvals,index=sfkeys)
+        st.bar_chart(df1)
+
+    if beta:
+        st.write("Getting beta for ARKG tickers...")
+        short_floats = get_finviz_data(tickers, "Beta")
+        sfkeys = []
+        sfvals = []
+        for item in short_floats:
+            if item[1] != "-":
+                sfkeys.append(item[0])
+                sfvals.append(float(item[1]))
         df1 = pd.DataFrame(sfvals,index=sfkeys)
         st.bar_chart(df1)
