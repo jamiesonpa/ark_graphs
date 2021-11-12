@@ -7,7 +7,119 @@ from pandas_datareader import DataReader
 import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
+import quandl
+import bs4 as BeautifulSoup
 
+def get_institutional_holders2(ticks):
+    quandl.ApiConfig.api_key = 'FDbdXFJJ3bzri6Qizxy7'
+    event_codes = [(11,"Entry into a Material Definitive Agreement"),(12,"Termination of a Material Definitive Agreement"),(13,"Bankruptcy or Receivership"),(14,"Mine Safety - Reporting of Shutdowns and Patterns of Violations"),(15,"Receipt of an Attorney's Written Notice Pursuant to 17 CFR 205.3(d) "),(21,"Completion of Acquisition or Disposition of Assets"),(22,"Results of Operations and Financial Condition"),(23,"Creation of a Direct Financial Obligation or an Obligation under an Off-Balance Sheet Arrangement of a Registrant"),(24,"Triggering Events That Accelerate or Increase a Direct Financial Obligation or an Obligation under an Off-Balance Sheet Arrangement"),(25,"Cost Associated with Exit or Disposal Activities"),(26,"Material Impairments"),(31,"Notice of Delisting or Failure to Satisfy a Continued Listing Rule or Standard; Transfer of Listing"),(32,"Unregistered Sales of Equity Securities"),(33,"Material Modifications to Rights of Security Holders"),(34,"Schedule 13G Filing"),(35,"Schedule 13D Filing"),(36,"Notice under Rule 12b25 of inability to timely file all or part of a Form 10-K or 10-Q"),(37,"Tender Offer Statement under Section 14(d)(1) or 13(e)(1) of the Securities Exchange Act of 1934"),(40,"Changes in Registrant's Certifying Accountant"),(41,"Changes in Registrant's Certifying Accountant"),(42,"Non-Reliance on Previously Issued Financial Statements or a Related Audit Report or Completed Interim Review"),(51,"Changes in Control of Registrant"),(52,"Departure of Directors or Certain Officers; Election of Directors; Appointment of Certain Officers: Compensatory Arrangements of Certain Officers"),(53,"Amendments to Articles of Incorporation or Bylaws; and/or Change in Fiscal Year"),(54,"Temporary Suspension of Trading Under Registrant's Employee Benefit Plans"),(55,"Amendments to the Registrant's Code of Ethics; or Waiver of a Provision of the Code of Ethics"),(56,"Change in Shell Company Status"),(57,"Submission of Matters to a Vote of Security Holders"),(58,"Shareholder Nominations Pursuant to Exchange Act Rule 14a-11"),(61,"ABS Informational and Computational Material"),(62,"Change of Servicer or Trustee"),(63,"Change in Credit Enhancement or Other External Support"),(64,"Failure to Make a Required Distribution"),(65,"Securities Act Updating Disclosure"),(71,"Regulation FD Disclosure"),(81,"Other Events"),(91,"Financial Statements and Exhibits")]
+    # for tick in ticks:
+    #     quandl.get(tick)
+
+def get_finviz_data(tickers):
+    base_link = "https://finviz.com/quote.ashx?t="
+    links = []
+    for ticker in tickers:
+        links.append(base_link+ticker)
+
+    return_vals = []
+    for link in links:
+        hdr = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36",
+                "X-Requested-With": "XMLHttpRequest"}
+        r = requests.get(link, headers = hdr)
+        soup = BeautifulSoup(r.content, 'html.parser')
+        table = None
+        try:
+            table = soup.find_all("table",{"class": "snapshot-table2"})
+        except:
+            pass
+        if len(table) > 0:
+            rows = table[0].find_all("tr")
+            data = {}
+            for row in rows:
+                cells = row.find_all("td")
+                counter = 0
+                names = []
+                
+                for cell in cells:
+                    name = ""
+                    value = ""
+                    if counter%2 == 0:
+                        found = False
+                        for name in names:
+                            if cell.text == name:
+                                found = True
+                        if found == False:
+                            names.append(cell.text)
+                    else:
+                        if found == False:
+                            data[names[-1]] = cell.text
+                    counter +=1
+        ticker = link.split("=")[1]
+        return_vals.append((ticker,data))
+    
+    return return_vals
+
+def get_news_data(tickers):
+    base_link = "https://finviz.com/quote.ashx?t="
+    links = []
+    for ticker in tickers:
+        links.append(base_link+ticker)
+
+    return_vals = []
+    for link in links:
+        # print("\n")
+        # print("getting news for " + link.split("=")[1])
+        hdr = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36",
+                "X-Requested-With": "XMLHttpRequest"}
+        r = requests.get(link, headers = hdr)
+        soup = BeautifulSoup(r.content, 'html.parser')
+        table = None
+        try:
+            table = soup.find_all("table",{"class": "fullview-news-outer"})
+        except:
+            pass
+        try:
+            if len(table) > 0:
+                rows = table[0].find_all("tr")
+                data = {}
+                months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+                most_recent_date = None
+                most_recent_date_found = False
+                second_most_recent_date = None
+                second_most_recent_date_found = False
+                for row in rows:
+                    for month in months:
+                        if row.text.find(month) != -1:
+                            if most_recent_date_found == False:
+                                most_recent_date = row.text.split(" ")[0]
+                                # print("most recent : " + most_recent_date)
+                                most_recent_date_found = True
+                            else:
+                                if second_most_recent_date_found == False:
+                                    second_most_recent_date = row.text.split(" ")[0]
+                                    # print("second most recent: " + second_most_recent_date)
+                                    second_most_recent_date_found = True
+                recent_news_list = []
+                for row in rows:
+                    if row != None:
+                        if row.text.find(second_most_recent_date) != -1:
+                            break
+                        else:
+                            if row.text.find("Motley Fool") == -1:
+                                if row.text.find("TipRanks") == -1:
+                                    if row.text.find("ACCESSWIRE") == -1:
+                                        if row.text.find("Law Offices") == -1:
+                                            if row.text.find("Business Daily") == -1:
+                                                if row.text.find("INVESTOR ALERT") == -1:
+                                                    recent_news_list.append(row.text.replace("\xa0\xa0"," "))
+                st.write(((link.split("=")[1])))
+                for item in recent_news_list:
+                    st.write("\t" + item)
+        except:
+            pass
 
 def get_institutional_holders(ticks):
     institutional_holders = {}
@@ -438,10 +550,9 @@ def get_simons_multiple(ticks):
             
 
 ticks = get_arkg_tickers()
-# get_institutional_holders(ticks[0:10])
+tickers = ticks
 
 st.title("ARKG Analytics Tool")
-
 tickerlist = st.sidebar.checkbox(label="List Tickers")
 sellside_ratings = st.sidebar.checkbox(label="Average Sellside Analyst Ratings")
 sellside_pt = st.sidebar.checkbox(label="Average Sellside Analyst PT %Difference From Current Price")
@@ -450,15 +561,12 @@ grossmargins = st.sidebar.checkbox(label="Gross Margins")
 opexrev = st.sidebar.checkbox(label="Opex/Revenue")
 simons = st.sidebar.checkbox(label="1y Growth Rate of (R&D/Revenue)")
 inst = st.sidebar.checkbox(label="Institutional Holder Info")
-
+news = st.sidebar.checkbox(label="ARKG News")
 analyze = st.sidebar.button("ANALYZYE")
 st.write("Preparing Tool...")
 tickers = get_arkg_tickers()
-tickers = tickers[0:20]
-tickers.append("WVE")
 st.write("Ready...")
 if analyze:
-
     if tickerlist:
         st.write("ARKG Tickers...")
         list_tickers(tickers)
@@ -489,3 +597,8 @@ if analyze:
     if inst:
         st.write("Getting share held by institutions...")
         get_institutional_holders(tickers)
+    
+    if news:
+        st.write("Getting news for all tickers in ARKG...")
+        get_institutional_holders(tickers)
+    
