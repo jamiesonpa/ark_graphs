@@ -563,6 +563,7 @@ inst = st.sidebar.checkbox(label="Institutional Holder Info")
 news = st.sidebar.checkbox(label="ARKG News")
 shortfloat = st.sidebar.checkbox(label="Short Float")
 beta = st.sidebar.checkbox(label="Beta")
+mcap = st.sidebar.checkbox(label="Market Cap")
 analyze = st.sidebar.button("ANALYZYE")
 st.write("Preparing Tool...")
 st.write("Ready...")
@@ -631,5 +632,25 @@ if analyze:
                 unfound.append(item[0])
              
         df1 = pd.DataFrame(betavals,index=betakeys)
+        st.bar_chart(df1)
+        st.write("Couldn't find values for " + str(unfound))
+    
+    if mcap:
+        st.write("Getting Market Cap for ARKG tickers...")
+        short_floats = get_finviz_data(tickers, "Market Cap")
+        mckeys = []
+        mcvals = []
+        unfound = []
+        for item in short_floats:
+            try:
+                flitem.replace("$","")
+                flitem.replace(",","")
+                flitem = float(item[1])
+                mckeys.append(item[0])
+                mcvals.append(flitem)
+            except:
+                unfound.append(item[0])
+             
+        df1 = pd.DataFrame(mcvals,index=mckeys)
         st.bar_chart(df1)
         st.write("Couldn't find values for " + str(unfound))
