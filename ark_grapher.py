@@ -9,11 +9,6 @@ import streamlit as st
 import matplotlib.pyplot as plt
 from bs4 import BeautifulSoup
 
-def get_institutional_holders2(ticks):
-    quandl.ApiConfig.api_key = 'FDbdXFJJ3bzri6Qizxy7'
-    event_codes = [(11,"Entry into a Material Definitive Agreement"),(12,"Termination of a Material Definitive Agreement"),(13,"Bankruptcy or Receivership"),(14,"Mine Safety - Reporting of Shutdowns and Patterns of Violations"),(15,"Receipt of an Attorney's Written Notice Pursuant to 17 CFR 205.3(d) "),(21,"Completion of Acquisition or Disposition of Assets"),(22,"Results of Operations and Financial Condition"),(23,"Creation of a Direct Financial Obligation or an Obligation under an Off-Balance Sheet Arrangement of a Registrant"),(24,"Triggering Events That Accelerate or Increase a Direct Financial Obligation or an Obligation under an Off-Balance Sheet Arrangement"),(25,"Cost Associated with Exit or Disposal Activities"),(26,"Material Impairments"),(31,"Notice of Delisting or Failure to Satisfy a Continued Listing Rule or Standard; Transfer of Listing"),(32,"Unregistered Sales of Equity Securities"),(33,"Material Modifications to Rights of Security Holders"),(34,"Schedule 13G Filing"),(35,"Schedule 13D Filing"),(36,"Notice under Rule 12b25 of inability to timely file all or part of a Form 10-K or 10-Q"),(37,"Tender Offer Statement under Section 14(d)(1) or 13(e)(1) of the Securities Exchange Act of 1934"),(40,"Changes in Registrant's Certifying Accountant"),(41,"Changes in Registrant's Certifying Accountant"),(42,"Non-Reliance on Previously Issued Financial Statements or a Related Audit Report or Completed Interim Review"),(51,"Changes in Control of Registrant"),(52,"Departure of Directors or Certain Officers; Election of Directors; Appointment of Certain Officers: Compensatory Arrangements of Certain Officers"),(53,"Amendments to Articles of Incorporation or Bylaws; and/or Change in Fiscal Year"),(54,"Temporary Suspension of Trading Under Registrant's Employee Benefit Plans"),(55,"Amendments to the Registrant's Code of Ethics; or Waiver of a Provision of the Code of Ethics"),(56,"Change in Shell Company Status"),(57,"Submission of Matters to a Vote of Security Holders"),(58,"Shareholder Nominations Pursuant to Exchange Act Rule 14a-11"),(61,"ABS Informational and Computational Material"),(62,"Change of Servicer or Trustee"),(63,"Change in Credit Enhancement or Other External Support"),(64,"Failure to Make a Required Distribution"),(65,"Securities Act Updating Disclosure"),(71,"Regulation FD Disclosure"),(81,"Other Events"),(91,"Financial Statements and Exhibits")]
-    # for tick in ticks:
-    #     quandl.get(tick)
 
 def get_finviz_data(tickers, param):
     base_link = "https://finviz.com/quote.ashx?t="
@@ -545,7 +540,31 @@ def get_simons_multiple(ticks):
     plt.ylabel("R&D/Revenue Change from Last year")
     plt.xlabel("Companies")
     plt.show()
-            
+
+def get_corp_names(ticks):
+    base_link = "https://finviz.com/quote.ashx?t="
+    links = []
+    for ticker in tickers:
+        links.append(base_link+ticker)
+    return_vals = []
+    for link in links:
+        hdr = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36",
+                "X-Requested-With": "XMLHttpRequest"}
+        r = requests.get(link, headers = hdr)
+        soup = BeautifulSoup(r.content, 'html.parser')
+        table = None
+        try:
+            table = soup.find_all("table",{"class": "fullview-title"})
+        except:
+            pass
+        if len(table) > 0:
+            rows = table[0].find_all("b")
+            for row in rows:
+                st.write((str(link.split('=')[1]) + ": " + row.text))
+
+def get_orphan_designations(ticks):
+    names = get_corp_names(ticks)
 
 ticks = get_arkg_tickers()
 tickers = ticks
