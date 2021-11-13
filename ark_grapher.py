@@ -643,9 +643,9 @@ if analyze:
         unfound = []
         for item in short_floats:
             if item[1].find("B") != -1:
-                price = float(item[0].replace("B",""))*(1000000000)
+                price = float(item[1].replace("B",""))*(1000000000)
             elif item[1].find("M") != -1:
-                price = float(item[0].replace("M",""))*(1000000)
+                price = float(item[1].replace("M",""))*(1000000)
             else:
                 pass
             mckeys.append(item[0])
