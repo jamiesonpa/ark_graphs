@@ -565,6 +565,7 @@ shortfloat = st.sidebar.checkbox(label="Short Float")
 beta = st.sidebar.checkbox(label="Beta")
 mcap = st.sidebar.checkbox(label="Market Cap")
 perfweek = st.sidebar.checkbox(label="Weekly Performance")
+perfmonth = st.sidebar.checkbox(label="Monthly Performance")
 analyze = st.sidebar.button("ANALYZYE")
 st.write("Preparing Tool...")
 st.write("Ready...")
@@ -628,6 +629,18 @@ if analyze:
                 pwkeys.append(item[0])
                 pwvals.append(float((str(item[1]).replace("%",""))))
         df1 = pd.DataFrame(pwvals,index=pwkeys)
+        st.bar_chart(df1)
+    
+    if perfmonth:
+        st.write("Getting monthly performance % for ARKG tickers...")
+        short_floats = get_finviz_data(tickers, "Perf Month")
+        pmkeys = []
+        pmvals = []
+        for item in short_floats:
+            if item[1] != "-":
+                pmkeys.append(item[0])
+                pmvals.append(float((str(item[1]).replace("%",""))))
+        df1 = pd.DataFrame(pmvals,index=pmkeys)
         st.bar_chart(df1)
 
     if beta:
