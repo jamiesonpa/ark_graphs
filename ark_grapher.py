@@ -567,6 +567,7 @@ mcap = st.sidebar.checkbox(label="Market Cap")
 perfweek = st.sidebar.checkbox(label="Weekly Performance")
 perfmonth = st.sidebar.checkbox(label="Monthly Performance")
 perfyear = st.sidebar.checkbox(label="Yearly Performance")
+quick = st.sidebar.checkbox(label = "Quick Ratio")
 
 analyze = st.sidebar.button("ANALYZYE")
 st.write("Preparing Tool...")
@@ -672,6 +673,24 @@ if analyze:
                 unfound.append(item[0])
              
         df1 = pd.DataFrame(betavals,index=betakeys)
+        st.bar_chart(df1)
+        st.write("Couldn't find values for " + str(unfound))
+
+    if quick:
+        st.write("Getting Quick ratio for ARKG tickers...")
+        short_floats = get_finviz_data(tickers, "Quick Ratio")
+        qkeys = []
+        qvals = []
+        unfound = []
+        for item in short_floats:
+            try:
+                flitem = float(item[1])
+                qkeys.append(item[0])
+                qvals.append(flitem)
+            except:
+                unfound.append(item[0])
+             
+        df1 = pd.DataFrame(qvals,index=qkeys)
         st.bar_chart(df1)
         st.write("Couldn't find values for " + str(unfound))
     
