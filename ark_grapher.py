@@ -57,7 +57,6 @@ def get_finviz_data(tickers, param):
                     counter +=1
         ticker = link.split("=")[1]
         return_vals.append((ticker,data[param]))
-        print(ticker + ": " + data[param])
     return return_vals
 
 def get_news_data(tickers):
@@ -568,6 +567,8 @@ perfweek = st.sidebar.checkbox(label="Weekly Performance")
 perfmonth = st.sidebar.checkbox(label="Monthly Performance")
 perfyear = st.sidebar.checkbox(label="Yearly Performance")
 quick = st.sidebar.checkbox(label = "Quick Ratio")
+employees = st.sidebar.checkbox(label= "Employee Count")
+
 
 analyze = st.sidebar.button("ANALYZYE")
 st.write("Preparing Tool...")
@@ -610,6 +611,9 @@ if analyze:
         st.write("Getting news for all tickers in ARKG...")
         get_news_data(tickers)
     
+    if employees:
+        st.write("Getting employee count for all tickers in ARKG")
+    
     if shortfloat:
         st.write("Getting short float % for ARKG tickers...")
         short_floats = get_finviz_data(tickers, "Short Float")
@@ -628,9 +632,8 @@ if analyze:
         pwkeys = []
         pwvals = []
         for item in short_floats:
-            if item[1] != "-":
-                pwkeys.append(item[0])
-                pwvals.append(float((str(item[1]).replace("%",""))))
+            pwkeys.append(item[0])
+            pwvals.append(float((str(item[1]).replace("%",""))))
         df1 = pd.DataFrame(pwvals,index=pwkeys)
         st.bar_chart(df1)
     
@@ -640,9 +643,8 @@ if analyze:
         pmkeys = []
         pmvals = []
         for item in short_floats:
-            if item[1] != "-":
-                pmkeys.append(item[0])
-                pmvals.append(float((str(item[1]).replace("%",""))))
+            pmkeys.append(item[0])
+            pmvals.append(float((str(item[1]).replace("%",""))))
         df1 = pd.DataFrame(pmvals,index=pmkeys)
         st.bar_chart(df1)
 
@@ -652,9 +654,8 @@ if analyze:
         pykeys = []
         pyvals = []
         for item in short_floats:
-            if item[1] != "-":
-                pykeys.append(item[0])
-                pyvals.append(float((str(item[1]).replace("%",""))))
+            pykeys.append(item[0])
+            pyvals.append(float((str(item[1]).replace("%",""))))
         df1 = pd.DataFrame(pyvals,index=pykeys)
         st.bar_chart(df1)
 
@@ -691,6 +692,25 @@ if analyze:
                 unfound.append(item[0])
              
         df1 = pd.DataFrame(qvals,index=qkeys)
+        st.bar_chart(df1)
+        st.write("Couldn't find values for " + str(unfound))
+
+    if employees:
+        st.write("Getting employees for ARKG tickers...")
+        short_floats = get_finviz_data(tickers, "Employees")
+        emkeys = []
+        emvals = []
+        unfound = []
+        for item in short_floats:
+            try:
+                flitem = float(item[1])
+                emkeys.append(item[0])
+                emvals.append(flitem)
+                st.write(item[0] +":" + str(flitem))
+            except:
+                unfound.append(item[0])
+             
+        df1 = pd.DataFrame(emvals,index=emkeys)
         st.bar_chart(df1)
         st.write("Couldn't find values for " + str(unfound))
     
