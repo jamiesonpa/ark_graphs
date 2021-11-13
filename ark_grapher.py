@@ -643,11 +643,14 @@ if analyze:
         unfound = []
         for item in short_floats:
             try:
-                flitem.replace("$","")
-                flitem.replace(",","")
-                flitem = float(item[1])
+                if item[0].find("B") != -1:
+                    price = float(item[0].replace("B",""))*(1000000000)
+                elif item[0].find("M") != -1:
+                    price = float(item[0].replace("M",""))*(1000000)
+                else:
+                    pass
                 mckeys.append(item[0])
-                mcvals.append(flitem)
+                mcvals.append(price)
             except:
                 unfound.append(item[0])
              
