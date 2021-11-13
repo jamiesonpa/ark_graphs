@@ -642,18 +642,15 @@ if analyze:
         mcvals = []
         unfound = []
         for item in short_floats:
-            try:
-                if item[1].find("B") != -1:
-                    price = float(item[0].replace("B",""))*(1000000000)
-                elif item[1].find("M") != -1:
-                    price = float(item[0].replace("M",""))*(1000000)
-                else:
-                    pass
-                mckeys.append(item[0])
-                mcvals.append(price)
-            except:
-                unfound.append(item[0])
-             
+            if item[1].find("B") != -1:
+                price = float(item[0].replace("B",""))*(1000000000)
+            elif item[1].find("M") != -1:
+                price = float(item[0].replace("M",""))*(1000000)
+            else:
+                pass
+            mckeys.append(item[0])
+            mcvals.append(price)
+            
         df1 = pd.DataFrame(mcvals,index=mckeys)
         st.bar_chart(df1)
         st.write("Couldn't find values for " + str(unfound))
