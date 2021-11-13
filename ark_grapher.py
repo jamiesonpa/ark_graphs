@@ -587,7 +587,7 @@ perfmonth = st.sidebar.checkbox(label="Monthly Performance")
 perfyear = st.sidebar.checkbox(label="Yearly Performance")
 quick = st.sidebar.checkbox(label = "Quick Ratio")
 employees = st.sidebar.checkbox(label= "Employee Count")
-
+corpnames = st.sidebar.checkbox(label= "Names")
 
 analyze = st.sidebar.button("ANALYZYE")
 st.write("Preparing Tool...")
@@ -630,8 +630,9 @@ if analyze:
         st.write("Getting news for all tickers in ARKG...")
         get_news_data(tickers)
     
-    if employees:
-        st.write("Getting employee count for all tickers in ARKG")
+    if corp_names:
+        st.write("Getting corp names for all tickers in ARKG...")
+        corpnames = get_corp_names(ticks)
     
     if shortfloat:
         st.write("Getting short float % for ARKG tickers...")
