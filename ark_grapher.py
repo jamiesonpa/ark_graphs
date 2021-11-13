@@ -566,6 +566,8 @@ beta = st.sidebar.checkbox(label="Beta")
 mcap = st.sidebar.checkbox(label="Market Cap")
 perfweek = st.sidebar.checkbox(label="Weekly Performance")
 perfmonth = st.sidebar.checkbox(label="Monthly Performance")
+perfyear = st.sidebar.checkbox(label="Yearly Performance")
+
 analyze = st.sidebar.button("ANALYZYE")
 st.write("Preparing Tool...")
 st.write("Ready...")
@@ -643,6 +645,18 @@ if analyze:
         df1 = pd.DataFrame(pmvals,index=pmkeys)
         st.bar_chart(df1)
 
+    if perfyear:
+        st.write("Getting yearly performance % for ARKG tickers...")
+        short_floats = get_finviz_data(tickers, "Perf Year")
+        pykeys = []
+        pyvals = []
+        for item in short_floats:
+            if item[1] != "-":
+                pykeys.append(item[0])
+                pyvals.append(float((str(item[1]).replace("%",""))))
+        df1 = pd.DataFrame(pyvals,index=pykeys)
+        st.bar_chart(df1)
+
     if beta:
         st.write("Getting beta for ARKG tickers...")
         short_floats = get_finviz_data(tickers, "Beta")
@@ -681,4 +695,6 @@ if analyze:
         df1 = pd.DataFrame(mcvals,index=mckeys)
         st.bar_chart(df1)
         st.write("Couldn't find values for " + str(unfound))
+    
+
 
