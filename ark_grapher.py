@@ -630,7 +630,7 @@ if analyze:
         st.write("Getting news for all tickers in ARKG...")
         get_news_data(tickers)
     
-    if corp_names:
+    if corpnames:
         st.write("Getting corp names for all tickers in ARKG...")
         corpnames = get_corp_names(ticks)
     
