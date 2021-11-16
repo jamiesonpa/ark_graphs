@@ -739,10 +739,13 @@ if stout == True:
             pyvals = []
             for item in perfy:
                 try:
+                    pykeysbad = False
                     pykeys.append(item[0])
+                    pykeysbad = True
                     pyvals.append(float((str(item[1]).replace("%",""))))
                 except:
-                    pass    
+                    if pykeysbad == True:
+                        pykeys = pykeys[0:(len(pykeys)-1)]
             df1 = pd.DataFrame(pyvals,index=pykeys)
             st.bar_chart(df1)
 
