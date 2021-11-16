@@ -748,7 +748,10 @@ if stout == True:
                         pykeys = pykeys[0:(len(pykeys)-1)]
             df1 = pd.DataFrame(pyvals,index=pykeys)
             st.bar_chart(df1)
-
+            counter = 0
+            for key in pykeys:
+                st.write(key + ", " + pyvals[counter])
+                counter+=1
         if beta:
             st.write("Getting beta for ARKG tickers...")
             short_floats = get_finviz_data(tickers, "Beta")
