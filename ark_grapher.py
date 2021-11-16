@@ -2,13 +2,35 @@
 from PIL.Image import ROTATE_90
 import requests
 import pandas as pd
+from streamlit.elements.arrow import _pandas_style_to_css
 from yahoo_fin import stock_info as si 
 from pandas_datareader import DataReader
 import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
 from bs4 import BeautifulSoup
+import math as maths
 
+
+def get_patents_data(tickers): #this isnt working yet, but it's close
+    names = get_corp_names(tickers, False)
+    patents = {}
+    for name in names:
+        patent_list = []
+        main_url="https://patents.google.com/"
+        params="?assignee=" + name[1] + "&after=priority:20110602&type=PATENT&num=100"
+
+        res=requests.get("https://patents.google.com/xhr/query?url=assignee%3DRoche%26after%3Dpriority%3A20110602%26type%3DPATENT%26num%3D100&exp=")
+        main_data=res.json()
+        data=main_data['results']['cluster']
+
+        for i in range(len(data[0]['result'])): 
+            num=data[0]['result'][i]['patent']['publication_number']
+            patent_list.append(num)
+            # print(main_url+"patent/"+num+"/en"+params)
+        patents[name[0]] = patent_list
+    for patent in patents.keys():
+        print(patents[patent])
 
 def get_finviz_data(tickers, param):
     base_link = "https://finviz.com/quote.ashx?t="
@@ -541,7 +563,8 @@ def get_simons_multiple(ticks):
     plt.xlabel("Companies")
     plt.show()
 
-def get_corp_names(ticks):
+def get_corp_names(ticks, stout):
+    names = []
     base_link = "https://finviz.com/quote.ashx?t="
     links = []
     for ticker in tickers:
@@ -561,199 +584,247 @@ def get_corp_names(ticks):
         if len(table) > 0:
             rows = table[0].find_all("b")
             for row in rows:
-                st.write((str(link.split('=')[1]) + ": " + row.text))
+                if stout:
+                    st.write((str(link.split('=')[1]) + ": " + row.text))
+                names.append((str(link.split('=')[1]), row.text))
+        
+    return names
 
 def get_orphan_designations(ticks):
-    names = get_corp_names(ticks)
+    names = get_corp_names(ticks, False)
+
+def get_cagr(vals):
+    fixed_vals = []
+    for val in vals:
+        if str(val) != "nan":
+            fixed_vals.append(val)
+    
+    if len(fixed_vals) > 2:
+        start = float(fixed_vals[0])
+        end = float(fixed_vals[1])
+        time = float(len(fixed_vals))
+        cagr = round((maths.pow((start/end),(1/time)) - 1)*100,2)
+        return cagr
+    else:
+        cagr = None
+        return cagr
+
+
+def get_cash_runway(ticks):
+    cash = {}
+    for tick in ticks:
+        print("getting cash for " + tick)
+        bs = si.get_balance_sheet(tick,yearly= False)
+        rownames = list(bs.index)
+        cashrow = bs.iloc[rownames.index("cash")].values.tolist()
+        cash[tick] = cashrow
+        print(cashrow)
+        cash_cagr = get_cagr(cashrow)
+        print(str(cash_cagr))
+
 
 ticks = get_arkg_tickers()
 tickers = ticks
 
-st.title("ARKG Analytics Tool")
-tickerlist = st.sidebar.checkbox(label="List Tickers")
-sellside_ratings = st.sidebar.checkbox(label="Average Sellside Analyst Ratings")
-sellside_pt = st.sidebar.checkbox(label="Average Sellside Analyst PT %Difference From Current Price")
-rdrevmultiple = st.sidebar.checkbox(label="R&D/Revenue Multiple")
-grossmargins = st.sidebar.checkbox(label="Gross Margins")
-opexrev = st.sidebar.checkbox(label="Opex/Revenue")
-simons = st.sidebar.checkbox(label="1y Growth Rate of (R&D/Revenue)")
-inst = st.sidebar.checkbox(label="Institutional Holder Info")
-news = st.sidebar.checkbox(label="ARKG News")
-shortfloat = st.sidebar.checkbox(label="Short Float")
-beta = st.sidebar.checkbox(label="Beta")
-mcap = st.sidebar.checkbox(label="Market Cap")
-perfweek = st.sidebar.checkbox(label="Weekly Performance")
-perfmonth = st.sidebar.checkbox(label="Monthly Performance")
-perfyear = st.sidebar.checkbox(label="Yearly Performance")
-quick = st.sidebar.checkbox(label = "Quick Ratio")
-employees = st.sidebar.checkbox(label= "Employee Count")
-corpnames = st.sidebar.checkbox(label= "Names")
-
-analyze = st.sidebar.button("ANALYZYE")
-st.write("Preparing Tool...")
-st.write("Ready...")
 
 
-if analyze:
-    if tickerlist:
-        st.write("ARKG Tickers...")
-        list_tickers(tickers)
-    if sellside_ratings:
-        st.write("Getting sellside ratings...")
-        get_sellside_ratings(tickers)
+stout = True
 
-    if sellside_pt:
-        st.write("Getting sellside PTs...")
-        get_sellside_pt(tickers)
+if stout == True:
+        
+    st.title("ARKG Analytics Tool")
+    tickerlist = st.sidebar.checkbox(label="List Tickers")
+    sellside_ratings = st.sidebar.checkbox(label="Average Sellside Analyst Ratings")
+    sellside_pt = st.sidebar.checkbox(label="Average Sellside Analyst PT %Difference From Current Price")
+    rdrevmultiple = st.sidebar.checkbox(label="R&D/Revenue Multiple")
+    grossmargins = st.sidebar.checkbox(label="Gross Margins")
+    opexrev = st.sidebar.checkbox(label="Opex/Revenue")
+    simons = st.sidebar.checkbox(label="1y Growth Rate of (R&D/Revenue)")
+    inst = st.sidebar.checkbox(label="Institutional Holder Info")
+    news = st.sidebar.checkbox(label="ARKG News")
+    shortfloat = st.sidebar.checkbox(label="Short Float")
+    beta = st.sidebar.checkbox(label="Beta")
+    mcap = st.sidebar.checkbox(label="Market Cap")
+    perfweek = st.sidebar.checkbox(label="Weekly Performance")
+    perfmonth = st.sidebar.checkbox(label="Monthly Performance")
+    perfyear = st.sidebar.checkbox(label="Yearly Performance")
+    quick = st.sidebar.checkbox(label = "Quick Ratio")
+    employees = st.sidebar.checkbox(label= "Employee Count")
+    corpnames = st.sidebar.checkbox(label= "Names")
+    cash_runway = st.sidebar.checkbox(label = "Cash Runway")
 
-    if rdrevmultiple:
-        st.write("Getting R&D/Revenue Multiples...")
-        get_rdrevenue(tickers)
+    analyze = st.sidebar.button("ANALYZYE")
+    st.write("Preparing Tool...")
+    st.write("Ready...")
 
-    if grossmargins:
-        st.write("Getting gross margins...")
-        get_gross_margins(tickers)
 
-    if opexrev:
-        st.write("Getting OpEx/Revenue...")
-        get_opex_over_revenue(tickers)
+    if analyze:
+        if tickerlist:
+            st.write("ARKG Tickers...")
+            list_tickers(tickers)
+        if sellside_ratings:
+            st.write("Getting sellside ratings...")
+            get_sellside_ratings(tickers)
 
-    if simons:
-        st.write("Getting (R&D/Revenue) Growthrate...")
-        get_simons_multiple(tickers)
-    
-    if inst:
-        st.write("Getting share held by institutions...")
-        get_institutional_holders(tickers)
-    
-    if news:
-        st.write("Getting news for all tickers in ARKG...")
-        get_news_data(tickers)
-    
-    if corpnames:
-        st.write("Getting corp names for all tickers in ARKG...")
-        corpnames = get_corp_names(ticks)
-    
-    if shortfloat:
-        st.write("Getting short float % for ARKG tickers...")
-        short_floats = get_finviz_data(tickers, "Short Float")
-        sfkeys = []
-        sfvals = []
-        for item in short_floats:
-            if item[1] != "-":
-                sfkeys.append(item[0])
-                sfvals.append(float((str(item[1]).replace("%",""))))
-        df1 = pd.DataFrame(sfvals,index=sfkeys)
-        st.bar_chart(df1)
+        if sellside_pt:
+            st.write("Getting sellside PTs...")
+            get_sellside_pt(tickers)
 
-    if perfweek:
-        st.write("Getting weekly performance % for ARKG tickers...")
-        short_floats = get_finviz_data(tickers, "Perf Week")
-        pwkeys = []
-        pwvals = []
-        for item in short_floats:
-            pwkeys.append(item[0])
-            pwvals.append(float((str(item[1]).replace("%",""))))
-        df1 = pd.DataFrame(pwvals,index=pwkeys)
-        st.bar_chart(df1)
-    
-    if perfmonth:
-        st.write("Getting monthly performance % for ARKG tickers...")
-        short_floats = get_finviz_data(tickers, "Perf Month")
-        pmkeys = []
-        pmvals = []
-        for item in short_floats:
-            pmkeys.append(item[0])
-            pmvals.append(float((str(item[1]).replace("%",""))))
-        df1 = pd.DataFrame(pmvals,index=pmkeys)
-        st.bar_chart(df1)
+        if rdrevmultiple:
+            st.write("Getting R&D/Revenue Multiples...")
+            get_rdrevenue(tickers)
 
-    if perfyear:
-        st.write("Getting yearly performance % for ARKG tickers...")
-        short_floats = get_finviz_data(tickers, "Perf Year")
-        pykeys = []
-        pyvals = []
-        for item in short_floats:
-            pykeys.append(item[0])
-            pyvals.append(float((str(item[1]).replace("%",""))))
-        df1 = pd.DataFrame(pyvals,index=pykeys)
-        st.bar_chart(df1)
+        if grossmargins:
+            st.write("Getting gross margins...")
+            get_gross_margins(tickers)
 
-    if beta:
-        st.write("Getting beta for ARKG tickers...")
-        short_floats = get_finviz_data(tickers, "Beta")
-        betakeys = []
-        betavals = []
-        unfound = []
-        for item in short_floats:
-            try:
-                flitem = float(item[1])
-                betakeys.append(item[0])
-                betavals.append(flitem)
-            except:
-                unfound.append(item[0])
-             
-        df1 = pd.DataFrame(betavals,index=betakeys)
-        st.bar_chart(df1)
-        st.write("Couldn't find values for " + str(unfound))
+        if opexrev:
+            st.write("Getting OpEx/Revenue...")
+            get_opex_over_revenue(tickers)
 
-    if quick:
-        st.write("Getting Quick ratio for ARKG tickers...")
-        short_floats = get_finviz_data(tickers, "Quick Ratio")
-        qkeys = []
-        qvals = []
-        unfound = []
-        for item in short_floats:
-            try:
-                flitem = float(item[1])
-                qkeys.append(item[0])
-                qvals.append(flitem)
-            except:
-                unfound.append(item[0])
-             
-        df1 = pd.DataFrame(qvals,index=qkeys)
-        st.bar_chart(df1)
-        st.write("Couldn't find values for " + str(unfound))
+        if simons:
+            st.write("Getting (R&D/Revenue) Growthrate...")
+            get_simons_multiple(tickers)
+        
+        if inst:
+            st.write("Getting share held by institutions...")
+            get_institutional_holders(tickers)
+        
+        if news:
+            st.write("Getting news for all tickers in ARKG...")
+            get_news_data(tickers)
+        
+        if corpnames:
+            st.write("Getting corp names for all tickers in ARKG...")
+            corpnames = get_corp_names(ticks, True)
+        
+        if shortfloat:
+            st.write("Getting short float % for ARKG tickers...")
+            short_floats = get_finviz_data(tickers, "Short Float")
+            sfkeys = []
+            sfvals = []
+            for item in short_floats:
+                if item[1] != "-":
+                    sfkeys.append(item[0])
+                    sfvals.append(float((str(item[1]).replace("%",""))))
+            df1 = pd.DataFrame(sfvals,index=sfkeys)
+            st.bar_chart(df1)
 
-    if employees:
-        st.write("Getting employees for ARKG tickers...")
-        short_floats = get_finviz_data(tickers, "Employees")
-        emkeys = []
-        emvals = []
-        unfound = []
-        for item in short_floats:
-            try:
-                flitem = float(item[1])
-                emkeys.append(item[0])
-                emvals.append(flitem)
-                st.write(item[0] +":" + str(flitem))
-            except:
-                unfound.append(item[0])
-             
-        df1 = pd.DataFrame(emvals,index=emkeys)
-        st.bar_chart(df1)
-        st.write("Couldn't find values for " + str(unfound))
-    
-    if mcap:
-        st.write("Getting Market Cap for ARKG tickers...")
-        short_floats = get_finviz_data(tickers, "Market Cap")
-        mckeys = []
-        mcvals = []
-        unfound = []
-        for item in short_floats:
-            if item[0] != "PFE":
-                if item[1].find("B") != -1:
-                    price = float(item[1].replace("B",""))*(1000000000)
-                elif item[1].find("M") != -1:
-                    price = float(item[1].replace("M",""))*(1000000)
-                else:
-                    pass
-                mckeys.append(item[0])
-                mcvals.append(price)
-            
-        df1 = pd.DataFrame(mcvals,index=mckeys)
-        st.bar_chart(df1)
-        st.write("Couldn't find values for " + str(unfound))
-    
+        if perfweek:
+            st.write("Getting weekly performance % for ARKG tickers...")
+            short_floats = get_finviz_data(tickers, "Perf Week")
+            pwkeys = []
+            pwvals = []
+            for item in short_floats:
+                pwkeys.append(item[0])
+                pwvals.append(float((str(item[1]).replace("%",""))))
+            df1 = pd.DataFrame(pwvals,index=pwkeys)
+            st.bar_chart(df1)
+        
+        if perfmonth:
+            st.write("Getting monthly performance % for ARKG tickers...")
+            short_floats = get_finviz_data(tickers, "Perf Month")
+            pmkeys = []
+            pmvals = []
+            for item in short_floats:
+                pmkeys.append(item[0])
+                pmvals.append(float((str(item[1]).replace("%",""))))
+            df1 = pd.DataFrame(pmvals,index=pmkeys)
+            st.bar_chart(df1)
+
+        if perfyear:
+            st.write("Getting yearly performance % for ARKG tickers...")
+            perfy = get_finviz_data(tickers, "Perf Year")
+            pykeys = []
+            pyvals = []
+            for item in perfy:
+                try:
+                    pykeys.append(item[0])
+                    pyvals.append(float((str(item[1]).replace("%",""))))
+                except:
+                    pass    
+            df1 = pd.DataFrame(pyvals,index=pykeys)
+            st.bar_chart(df1)
+
+        if beta:
+            st.write("Getting beta for ARKG tickers...")
+            short_floats = get_finviz_data(tickers, "Beta")
+            betakeys = []
+            betavals = []
+            unfound = []
+            for item in short_floats:
+                try:
+                    flitem = float(item[1])
+                    betakeys.append(item[0])
+                    betavals.append(flitem)
+                except:
+                    unfound.append(item[0])
+                
+            df1 = pd.DataFrame(betavals,index=betakeys)
+            st.bar_chart(df1)
+            st.write("Couldn't find values for " + str(unfound))
+
+        if quick:
+            st.write("Getting Quick ratio for ARKG tickers...")
+            short_floats = get_finviz_data(tickers, "Quick Ratio")
+            qkeys = []
+            qvals = []
+            unfound = []
+            for item in short_floats:
+                try:
+                    flitem = float(item[1])
+                    qkeys.append(item[0])
+                    qvals.append(flitem)
+                except:
+                    unfound.append(item[0])
+                
+            df1 = pd.DataFrame(qvals,index=qkeys)
+            st.bar_chart(df1)
+            st.write("Couldn't find values for " + str(unfound))
+
+        if cash_runway:
+            st.write("Getting cash runway (rounded down quarters) for ARKG tickers...")
+            get_cash_runway(tickers)
+
+        if employees:
+            st.write("Getting employees for ARKG tickers...")
+            short_floats = get_finviz_data(tickers, "Employees")
+            emkeys = []
+            emvals = []
+            unfound = []
+            for item in short_floats:
+                try:
+                    flitem = float(item[1])
+                    emkeys.append(item[0])
+                    emvals.append(flitem)
+                    st.write(item[0] +":" + str(flitem))
+                except:
+                    unfound.append(item[0])
+                
+            df1 = pd.DataFrame(emvals,index=emkeys)
+            st.bar_chart(df1)
+            st.write("Couldn't find values for " + str(unfound))
+        
+        if mcap:
+            st.write("Getting Market Cap for ARKG tickers...")
+            short_floats = get_finviz_data(tickers, "Market Cap")
+            mckeys = []
+            mcvals = []
+            unfound = []
+            for item in short_floats:
+                if item[0] != "PFE":
+                    if item[1].find("B") != -1:
+                        price = float(item[1].replace("B",""))*(1000000000)
+                    elif item[1].find("M") != -1:
+                        price = float(item[1].replace("M",""))*(1000000)
+                    else:
+                        pass
+                    mckeys.append(item[0])
+                    mcvals.append(price)
+                
+            df1 = pd.DataFrame(mcvals,index=mckeys)
+            st.bar_chart(df1)
+            st.write("Couldn't find values for " + str(unfound))
+        
 
 
