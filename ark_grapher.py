@@ -750,7 +750,7 @@ if stout == True:
             st.bar_chart(df1)
             counter = 0
             for key in pykeys:
-                st.write(key + ", " + pyvals[counter])
+                st.write(key + ", " + str(pyvals[counter]))
                 counter+=1
         if beta:
             st.write("Getting beta for ARKG tickers...")
